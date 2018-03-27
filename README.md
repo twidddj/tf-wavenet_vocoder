@@ -22,12 +22,18 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 **Check the usage of the incremental generator in <a href="./notebook/demo fast generation.ipynb">here</a>.**
 
+## Applications
+
+### Vocoder
+
+
 ## Requirements
 Code is tested on TensorFlow version 1.4 for Python 3.6.
 
 ## Related projects
 - [Wavenet](https://github.com/ibab/tensorflow-wavenet)
-- [Wavenet vocoder](https://github.com/r9y9/wavenet_vocoder)
+- [Wavenet vocoder in Pytorch](https://github.com/r9y9/wavenet_vocoder)
+- [Wavenet vocoder in Tensorflow](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev)
 - [Fast wavenet](https://github.com/tomlepaine/fast-wavenet)
 
 ## References

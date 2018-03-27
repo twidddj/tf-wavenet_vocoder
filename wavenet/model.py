@@ -398,7 +398,7 @@ class WaveNetModel(object):
 
         return skip_contribution, input_batch + transformed
 
-    def _create_network(self, input_batch, local_condition_batch, global_condition_batch):
+    def create_network(self, input_batch, local_condition_batch, global_condition_batch):
         '''Construct the WaveNet network.'''
         outputs = []
         current_layer = input_batch
@@ -627,7 +627,7 @@ class WaveNetModel(object):
                 encoded = self._one_hot(waveform)
 
             gc_embedding = self._embed_gc(global_condition)
-            raw_output = self._create_network(encoded, local_condition, gc_embedding)
+            raw_output = self.create_network(encoded, local_condition, gc_embedding)
             out = tf.reshape(raw_output, [-1, self.quantization_channels])
             # Cast to float64 to avoid bug in TensorFlow
             proba = tf.cast(
@@ -689,7 +689,7 @@ class WaveNetModel(object):
             network_input = tf.slice(network_input, [0, 0, 0],
                                      [-1, network_input_width, -1])
 
-            raw_output = self._create_network(network_input, local_condition_batch, gc_embedding)
+            raw_output = self.create_network(network_input, local_condition_batch, gc_embedding)
 
             with tf.name_scope('loss'):
                 # Cut off the samples corresponding to the receptive field
