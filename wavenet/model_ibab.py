@@ -720,11 +720,8 @@ class WaveNetModel(object):
                     [0, self.receptive_field, 0],
                     [-1, -1, -1])
 
-                target_output = tf.Print(target_output, [tf.shape(target_output)], message='target_output shape:')
                 target_output = tf.reshape(target_output, [-1, self.quantization_channels])
-                raw_output = tf.Print(raw_output, [tf.shape(raw_output)], message='raw_output shape:')
                 prediction = tf.reshape(raw_output, [-1, self.quantization_channels])
-                prediction = tf.Print(prediction, [tf.shape(prediction)], message='prediction shape:')
 
                 loss = tf.nn.softmax_cross_entropy_with_logits(
                     logits=prediction,

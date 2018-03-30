@@ -10,7 +10,7 @@ Our works build on Ibab's [Implementation](https://github.com/ibab/tensorflow-wa
 ## Features
 - [x] Local conditioning
 - [x] Generalized fast generation algorithm
-- [ ] Mixture of discretized logistics loss
+- [x] Mixture of discretized logistics loss
 - [ ] Parallel Wavenet
 
 ### Generalized fast generation algorithm
@@ -26,9 +26,27 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 ### Vocoder
 
+Neural Vocoder can generate high quality raw speech samples conditioned on linguistic or acoustic features.
+
+We have tested our model based on azraelkuan's [code](https://github.com/azraelkuan/tensorflow_wavenet_vocoder)
+
+#### Getting Start
+
+##### Download dataset
++ the voice conversion dataset(for multi speaker, 16k): [cmu_arctic](http://festvox.org/cmu_arctic/)
++ the single speaker dataset(22.05k): [LJSpeech-1.0](https://keithito.com/LJ-Speech-Dataset/)
+
+##### Preprocess data
+> `python -m apps.vocoder.preprocess --num_workers 4 --name ljspeech --in_dir /your_path/LJSpeech-1.0 --out_dir /your_outpath/ --hparams sample_rate=22050`
+
+##### Train model
+> `python -m apps.vocoder.train --metadata_path {~/yourpath/train.txt} --data_path {~/yourpath} --log_dir {~/log_dir_path}`
+
+##### Test model
+You can find the codes for testing trained model in <a href="./notebook/test vocoder.ipynb">here</a>.
 
 ## Requirements
-Code is tested on TensorFlow version 1.4 for Python 3.6.
+Code is tested only on TensorFlow version 1.4 for Python 3.6.
 
 ## Related projects
 - [Wavenet](https://github.com/ibab/tensorflow-wavenet)
