@@ -28,20 +28,20 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 Neural Vocoder can generate high quality raw speech samples conditioned on linguistic or acoustic features.
 
-We have tested our model based on azraelkuan's [code](https://github.com/azraelkuan/tensorflow_wavenet_vocoder)
+We have tested our model based on azraelkuan's [vocoder](https://github.com/azraelkuan/tensorflow_wavenet_vocoder)
 
 #### Getting Start
-#### 0.Download dataset
+#### 0. Download dataset
 + the voice conversion dataset(for multi speaker, 16k): [cmu_arctic](http://festvox.org/cmu_arctic/)
 + the single speaker dataset(22.05k): [LJSpeech-1.0](https://keithito.com/LJ-Speech-Dataset/)
 
-#### 1.Preprocess data
+#### 1. Preprocess data
 > `python -m apps.vocoder.preprocess --num_workers 4 --name ljspeech --in_dir /your_path/LJSpeech-1.0 --out_dir /your_outpath/` 
 
-#### 2.Train model
+#### 2. Train model
 > `python -m apps.vocoder.train --metadata_path {~/yourpath/train.txt} --data_path {~/yourpath} --log_dir {~/log_dir_path}`
 
-#### 3.Test model
+#### 3. Test model
 You can find the codes for testing trained model in <a href="./notebook/test vocoder.ipynb">here</a>.
 
 ## Requirements
