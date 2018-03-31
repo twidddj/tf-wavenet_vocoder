@@ -48,7 +48,7 @@ class Vocoder(object):
                     for i in range(len(hparams.upsample_factor)):
                         layer['upsample{}'.format(i)] = \
                             create_variable('upsample{}'.format(i),
-                                            [hparams.upsample_factor[i], self.net.filter_width, 1, 1])
+                                            [hparams.upsample_factor[i], 1, 1, 1])
                     self.upsample_var = layer
                     self.upsample_scope = upsample_scope
 
@@ -71,6 +71,7 @@ class Vocoder(object):
                 strides=[1, self.upsample_factor[i], 1, 1],
                 output_shape=output_shape
             )
+            local_condition_batch = tf.nn.relu(local_condition_batch)
 
         local_condition_batch = tf.squeeze(local_condition_batch, [3])
         return local_condition_batch
