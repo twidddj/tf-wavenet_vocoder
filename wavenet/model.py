@@ -188,7 +188,15 @@ class WaveNetModel(object):
                              self.dilation_channels])
                         
                         current['cond_filter'] = create_variable('cond_filter', [1, self.lc_dim, self.dilation_channels])
-                        current['cond_gate'] = create_variable('cond_gate', [1, self.lc_dim, self.dilation_channels])                        
+                        current['cond_gate'] = create_variable('cond_gate', [1, self.lc_dim, self.dilation_channels])
+                        if self.use_biases:
+                            current['cond_filter_bias'] = create_bias_variable(
+                                'cond_filter_bias',
+                                [self.dilation_channels])
+                            current['cond_gate_bias'] = create_bias_variable(
+                                'cond_gate_bias',
+                                [self.dilation_channels])
+
                         current['dense'] = create_variable(
                             'dense',
                             [1,
@@ -294,7 +302,10 @@ class WaveNetModel(object):
             condition_cut = tf.shape(local_condition_batch)[1] - tf.shape(conv_filter)[1]
             lc = tf.slice(local_condition_batch, [0, condition_cut, 0], [-1, -1, -1])
             conv_filter += tf.nn.conv1d(lc, variables['cond_filter'], stride=1, padding="SAME", name="cond_filter")
-            conv_gate += tf.nn.conv1d(lc, variables['cond_gate'], stride=1, padding="SAME", name="cond_gate")            
+            conv_gate += tf.nn.conv1d(lc, variables['cond_gate'], stride=1, padding="SAME", name="cond_gate")
+            if self.use_biases:
+                conv_filter += variables['cond_filter_bias']
+                conv_gate += variables['cond_gate_bias']
 
         if global_condition_batch is not None:
             conv_filter += tf.nn.conv1d(global_condition_batch, variables['gc_filtweights'], stride=1, padding="SAME",
@@ -305,8 +316,8 @@ class WaveNetModel(object):
         if self.use_biases:
             filter_bias = variables['filter_bias']
             gate_bias = variables['gate_bias']
-            conv_filter = tf.add(conv_filter, filter_bias)
-            conv_gate = tf.add(conv_gate, gate_bias)
+            conv_filter += filter_bias
+            conv_gate += gate_bias
 
         out = tf.tanh(conv_filter) * tf.sigmoid(conv_gate)
 
@@ -383,6 +394,9 @@ class WaveNetModel(object):
         if local_condition_batch is not None:
             output_filter += tf.matmul(local_condition_batch, variables['cond_filter'][0, :, :])
             output_gate += tf.matmul(local_condition_batch, variables['cond_gate'][0, :, :])
+            if self.use_biases:
+                output_filter += variables['cond_filter_bias']
+                output_gate += variables['cond_gate_bias']
 
         if global_condition_batch is not None:
             output_filter += tf.matmul(global_condition_batch, variables['gc_filtweights'][0, :, :])
