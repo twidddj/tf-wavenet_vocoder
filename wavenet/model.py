@@ -1,3 +1,9 @@
+"""
+the code is adapted from:
+https://github.com/ibab/tensorflow-wavenet/blob/master/wavenet/model.py
+
+"""
+
 import numpy as np
 import tensorflow as tf
 
@@ -62,7 +68,7 @@ class WaveNetModel(object):
                  histograms=False,
                  global_condition_channels=None,
                  global_condition_cardinality=None,
-                 local_condition_dim=128):
+                 local_condition_channels=80):
         '''Initializes the WaveNet model.
 
         Args:
@@ -85,8 +91,7 @@ class WaveNetModel(object):
                 input to the network instead of one-hot encoding it.
                 Default: False.
             initial_filter_width: The width of the initial filter of the
-                convolution applied to the scalar input. This is only relevant
-                if scalar_input=True.
+                initial convolution.
             histograms: Whether to store histograms in the summary.
                 Default: False.
             global_condition_channels: Number of channels in (embedding
@@ -117,7 +122,7 @@ class WaveNetModel(object):
         self.histograms = histograms
         self.global_condition_channels = global_condition_channels
         self.global_condition_cardinality = global_condition_cardinality
-        self.lc_dim = local_condition_dim
+        self.local_condition_channels = local_condition_channels
 
         self.receptive_field = WaveNetModel.calculate_receptive_field(
             self.filter_width, self.dilations, self.scalar_input,
@@ -187,8 +192,8 @@ class WaveNetModel(object):
                              self.residual_channels,
                              self.dilation_channels])
                         
-                        current['cond_filter'] = create_variable('cond_filter', [1, self.lc_dim, self.dilation_channels])
-                        current['cond_gate'] = create_variable('cond_gate', [1, self.lc_dim, self.dilation_channels])
+                        current['cond_filter'] = create_variable('cond_filter', [1, self.local_condition_channels, self.dilation_channels])
+                        current['cond_gate'] = create_variable('cond_gate', [1, self.local_condition_channels, self.dilation_channels])
                         if self.use_biases:
                             current['cond_filter_bias'] = create_bias_variable(
                                 'cond_filter_bias',

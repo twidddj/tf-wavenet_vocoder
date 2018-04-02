@@ -41,7 +41,7 @@ class Vocoder(object):
                                     global_condition_channels=global_condition_channels,
                                     global_condition_cardinality=global_condition_cardinality,
                                     use_biases=True,
-                                    local_condition_dim=hparams.num_mels)
+                                    local_condition_channels=hparams.num_mels)
 
             if hparams.upsample_conditional_features:
                 with tf.variable_scope('upsample_layer') as upsample_scope:

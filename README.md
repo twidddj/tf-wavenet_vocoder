@@ -1,11 +1,9 @@
 # Wavenet
 The WaveNet neural network architecture directly generates a raw audio waveform, showing excellent results in text-to-speech and general audio generation.
 
-Moreover It can be used almost all sequence generation such as text or image generation.
+Moreover It can be used almost all sequence generation even text or image.
 
-This repository provides some works related to [WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/). 
-
-Our works build on Ibab's [Implementation](https://github.com/ibab/tensorflow-wavenet).
+This repository provides some works related to [WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/).
 
 ## Features
 - [x] Local conditioning
@@ -28,7 +26,7 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 Neural Vocoder can generate high quality raw speech samples conditioned on linguistic or acoustic features.
 
-We have tested our model based on azraelkuan's [vocoder](https://github.com/azraelkuan/tensorflow_wavenet_vocoder)
+We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet_vocoder) and adapted some codes from [azraelkuan's one](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev)
 
 #### Getting Start
 #### 0. Download dataset
