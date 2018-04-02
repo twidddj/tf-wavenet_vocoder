@@ -54,11 +54,14 @@ def train(log_dir, metadata_path, data_path):
     all_params = tf.trainable_variables()
     global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
     optimizer = optimizer_factory['adam'](learning_rate=1e-3, momentum=None)
-    #     grads_and_vars = optimizer.compute_gradients(loss, all_params)
-    #     grads_and_vars = list(filter(lambda t: t[0] is not None, grads_and_vars))
-    #     capped_gvs = [(tf.clip_by_norm(grad, 5.0), var) for grad, var in grads_and_vars]
-    #     optim = optimizer.apply_gradients(capped_gvs)
-    optim = optimizer.minimize(loss, var_list=all_params, global_step=global_step)
+
+    if hparams.clip_thresh > 0:
+        grads_and_vars = optimizer.compute_gradients(loss, all_params)
+        grads_and_vars = list(filter(lambda t: t[0] is not None, grads_and_vars))
+        capped_gvs = [(tf.clip_by_norm(grad, hparams.clip_thresh), var) for grad, var in grads_and_vars]
+        optim = optimizer.apply_gradients(capped_gvs)
+    else:
+        optim = optimizer.minimize(loss, var_list=all_params, global_step=global_step)
 
     # Track the moving averages of all trainable variables.
     ema = tf.train.ExponentialMovingAverage(hparams.MOVING_AVERAGE_DECAY, global_step)

@@ -4,10 +4,11 @@ import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 
-from wavenet.model import WaveNetModel, create_variable
+from wavenet.model import WaveNetModel, create_bias_variable
 from apps.vocoder.hparams import hparams
 
 import nnmnkwii.preprocessing as P
+
 
 class Vocoder(object):
     def __init__(self, max_to_keep=5):
@@ -46,9 +47,13 @@ class Vocoder(object):
                 with tf.variable_scope('upsample_layer') as upsample_scope:
                     layer = dict()
                     for i in range(len(hparams.upsample_factor)):
-                        layer['upsample{}'.format(i)] = \
-                            create_variable('upsample{}'.format(i),
-                                            [hparams.upsample_factor[i], 1, 1, 1])
+                        shape = [hparams.upsample_factor[i], hparams.filter_width, 1, 1]
+                        weights = np.ones(shape) * 1 / float(hparams.upsample_factor[i])
+                        init = tf.constant_initializer(value=weights, dtype=tf.float32)
+                        variable = tf.get_variable(name='upsample{}'.format(i), initializer=init, shape=weights.shape)
+                        layer['upsample{}_filter'.format(i)] = variable
+                        layer['upsample{}_bias'.format(i)] = create_bias_variable('upsample{}_bias'.format(i), [1])
+
                     self.upsample_var = layer
                     self.upsample_scope = upsample_scope
 
@@ -67,19 +72,19 @@ class Vocoder(object):
             output_shape = tf.stack([batch_size, upsample_dim, tf.shape(local_condition_batch)[2], 1])
             local_condition_batch = tf.nn.conv2d_transpose(
                 local_condition_batch,
-                layer_filter['upsample{}'.format(i)],
+                layer_filter['upsample{}_filter'.format(i)],
                 strides=[1, self.upsample_factor[i], 1, 1],
                 output_shape=output_shape
             )
+            local_condition_batch += layer_filter['upsample{}_bias'.format(i)]
             local_condition_batch = tf.nn.relu(local_condition_batch)
 
         local_condition_batch = tf.squeeze(local_condition_batch, [3])
         return local_condition_batch
 
     def loss(self, x, l, g):
-        l = self.create_upsample(l)
-        loss = self.net.loss(x, l, g, l2_regularization_strength=hparams.l2_regularization_strength)
-        self.upsampled_lc = l
+        self.upsampled_lc = self.create_upsample(l)
+        loss = self.net.loss(x, self.upsampled_lc, g, l2_regularization_strength=hparams.l2_regularization_strength)
 
         return loss
 
@@ -162,15 +167,19 @@ class Generator(object):
 
         seeds = [seeds]
         seeds = np.repeat(seeds, self.batch_size, axis=0)
-        generated = []
+        #         generated = []
+        generated = [seeds]
 
-        for j in tqdm(range(receptive_field + n_samples)):
-            if j < receptive_field:
-                sample = seeds
-                current_lc = np.zeros((self.batch_size, hparams.num_mels))
-            else:
-                sample = generated[-1]
-                current_lc = lc[:, j - receptive_field, :]
+        #         for j in tqdm(range(receptive_field + n_samples)):
+        #             if j < receptive_field:
+        #                 sample = seeds
+        #                 current_lc = np.zeros((self.batch_size, hparams.num_mels))
+        #             else:
+        #                 sample = generated[-1]
+        #                 current_lc = lc[:, j - receptive_field, :]
+        for j in tqdm(range(n_samples)):
+            sample = generated[-1]
+            current_lc = lc[:, j, :]
 
             # Generation phase
             feed_dict = {
@@ -199,7 +208,8 @@ class Generator(object):
 
             generated.append(generated_sample)
 
-        result = np.hstack(generated)[:, receptive_field:]
+        # result = np.hstack(generated)[:, receptive_field:]
+        result = np.hstack(generated)
         if not self.vocoder.net.scalar_input:
             result = P.inv_mulaw_quantize(result.astype(np.int16), self.vocoder.net.quantization_channels)
 

@@ -60,6 +60,7 @@ hparams = tf.contrib.training.HParams(
     MOVING_AVERAGE_DECAY=0.9995,
     checkpoint_interval=10000,
     train_eval_interval=10000,
+    clip_thresh=-1,
 
     LEARNING_RATE_DECAY_FACTOR=0.5,
     NUM_STEPS_RATIO_PER_DECAY=0.3,
