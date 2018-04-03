@@ -53,7 +53,17 @@ def train(log_dir, metadata_path, data_path):
 
     all_params = tf.trainable_variables()
     global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
-    optimizer = optimizer_factory['adam'](learning_rate=1e-3, momentum=None)
+
+    decay_steps = hparams.NUM_STEPS_RATIO_PER_DECAY * hparams.max_num_step
+    # Decay the learning rate exponentially based on the number of steps.
+    lr = tf.train.exponential_decay(hparams.initial_learning_rate,
+                                    global_step,
+                                    decay_steps,
+                                    hparams.LEARNING_RATE_DECAY_FACTOR,
+                                    staircase=True)
+
+    # lr = hparams.initial_learning_rate
+    optimizer = optimizer_factory['adam'](learning_rate=lr, momentum=None)
 
     if hparams.clip_thresh > 0:
         grads_and_vars = optimizer.compute_gradients(loss, all_params)
@@ -70,13 +80,17 @@ def train(log_dir, metadata_path, data_path):
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
+
+        last_step, _ = vocoder.load(sess, log_dir)
+        last_step = last_step or 1
+
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
         reader.start_threads(sess)
 
         try:
             print_loss = 0.
             start_time = time()
-            for step in range(1, int(1e6)):
+            for step in range(last_step, hparams.max_num_step):
 
                 if gc_batch is None:
                     fetches = [audio_batch, vocoder.upsampled_lc, loss, train_op]

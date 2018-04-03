@@ -55,13 +55,15 @@ hparams = tf.contrib.training.HParams(
     l2_regularization_strength=None,
 
     # Training
-    batch_size=3,
-    sample_size=10000,
-    MOVING_AVERAGE_DECAY=0.9995,
+    batch_size=2,
+    sample_size=15000,
     checkpoint_interval=10000,
     train_eval_interval=10000,
     clip_thresh=-1,
+    initial_learning_rate=1e-4,
+    max_num_step=int(1e6),
 
+    MOVING_AVERAGE_DECAY=0.9999,
     LEARNING_RATE_DECAY_FACTOR=0.5,
     NUM_STEPS_RATIO_PER_DECAY=0.3,
 
