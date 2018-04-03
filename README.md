@@ -40,7 +40,7 @@ We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet
 > `python -m apps.vocoder.train --metadata_path {~/yourpath/train.txt} --data_path {~/yourpath} --log_dir {~/log_dir_path}`
 
 #### 3. Test model
-You can find the codes for testing trained model in <a href="./notebook/test vocoder.ipynb">here</a>.
+You can find the codes for testing trained model in <a href="./apps/vocoder/notebook/test vocoder.ipynb">here</a>.
 
 ## Requirements
 Code is tested on TensorFlow version 1.4 for Python 3.6.
