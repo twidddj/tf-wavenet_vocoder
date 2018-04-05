@@ -1,11 +1,9 @@
 # Wavenet
 The WaveNet neural network architecture directly generates a raw audio waveform, showing excellent results in text-to-speech and general audio generation.
 
-Moreover It can be used almost all sequence generation such as text or image generation.
+Moreover It can be used almost all sequence generation even text or image.
 
-This repository provides some works related to [WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/). 
-
-Our works build on Ibab's [Implementation](https://github.com/ibab/tensorflow-wavenet).
+This repository provides some works related to [WaveNet](https://deepmind.com/blog/wavenet-generative-model-raw-audio/).
 
 ## Features
 - [x] Local conditioning
@@ -28,25 +26,24 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 Neural Vocoder can generate high quality raw speech samples conditioned on linguistic or acoustic features.
 
-We have tested our model based on azraelkuan's [code](https://github.com/azraelkuan/tensorflow_wavenet_vocoder)
+We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet_vocoder) and adapted some codes from [azraelkuan's one](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev)
 
 #### Getting Start
-
-##### Download dataset
+#### 0. Download dataset
 + the voice conversion dataset(for multi speaker, 16k): [cmu_arctic](http://festvox.org/cmu_arctic/)
 + the single speaker dataset(22.05k): [LJSpeech-1.0](https://keithito.com/LJ-Speech-Dataset/)
 
-##### Preprocess data
-> `python -m apps.vocoder.preprocess --num_workers 4 --name ljspeech --in_dir /your_path/LJSpeech-1.0 --out_dir /your_outpath/ --hparams sample_rate=22050`
+#### 1. Preprocess data
+> `python -m apps.vocoder.preprocess --num_workers 4 --name ljspeech --in_dir /your_path/LJSpeech-1.0 --out_dir /your_outpath/` 
 
-##### Train model
+#### 2. Train model
 > `python -m apps.vocoder.train --metadata_path {~/yourpath/train.txt} --data_path {~/yourpath} --log_dir {~/log_dir_path}`
 
-##### Test model
-You can find the codes for testing trained model in <a href="./notebook/test vocoder.ipynb">here</a>.
+#### 3. Test model
+You can find the codes for testing trained model in <a href="./apps/vocoder/notebook/test vocoder.ipynb">here</a>.
 
 ## Requirements
-Code is tested only on TensorFlow version 1.4 for Python 3.6.
+Code is tested on TensorFlow version 1.4 for Python 3.6.
 
 ## Related projects
 - [Wavenet](https://github.com/ibab/tensorflow-wavenet)
