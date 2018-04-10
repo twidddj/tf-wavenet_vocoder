@@ -39,7 +39,7 @@ Audio samples are available at https://twidddj.github.io/docs/vocoder. See the i
 > `python -m apps.vocoder.preprocess --num_workers 4 --name ljspeech --in_dir /your_path/LJSpeech-1.0 --out_dir /your_outpath/` 
 
 #### 2. Train model
-> `python -m apps.vocoder.train --metadata_path {~/yourpath/train.txt} --data_path {~/yourpath} --log_dir {~/log_dir_path}`
+> `python -m apps.vocoder.train --metadata_path {~/yourpath/train.txt} --data_path {~/yourpath/npy} --log_dir {~/log_dir_path}`
 
 #### 3. Test model
 You can find the codes for testing trained model in <a href="./apps/vocoder/notebook/test vocoder.ipynb">here</a>.

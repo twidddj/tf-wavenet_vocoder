@@ -9,7 +9,7 @@ module_path = os.path.abspath(os.getcwd())
 if module_path not in sys.path:
     sys.path.append(module_path)
 
-from apps.vocoder.model import Vocoder, Generator, optimizer_factory
+from apps.vocoder.model import Vocoder, optimizer_factory
 from apps.vocoder.hparams import hparams
 from apps.vocoder.datasets.data_feeder import DataFeeder
 from apps.vocoder.audio import save_wav
@@ -29,7 +29,7 @@ def get_arguments():
 def train(log_dir, metadata_path, data_path):
     tf.reset_default_graph()
     vocoder = Vocoder()
-    generator = Generator(vocoder, gc_enable=hparams.gc_enable, batch_size=hparams.batch_size)
+    vocoder.init_synthesizer(hparams.batch_size, gc_enable=hparams.gc_enable)
 
     coord = tf.train.Coordinator()
     reader = DataFeeder(
@@ -113,7 +113,7 @@ def train(log_dir, metadata_path, data_path):
                     vocoder.save(sess, log_dir, step)
 
                 if step % hparams.train_eval_interval == 0:
-                    samples = generator.generate(sess, _x.shape[1], _lc, _gc)
+                    samples = vocoder.synthesize(sess, _x.shape[1], _lc, _gc)
                     targets = _x.reshape(hparams.batch_size, -1)
 
                     for j in range(hparams.batch_size):
