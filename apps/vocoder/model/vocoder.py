@@ -119,13 +119,9 @@ class Vocoder(object):
             print(" No checkpoint found.")
             return None, sess
 
-
-class Generator(object):
-    def __init__(self, vocoder, gc_enable=True, batch_size=1):
-        # For generation
-        self.vocoder = vocoder
+    def init_synthesizer(self, batch_size, gc_enable=True):
         self.batch_size = batch_size
-        if vocoder.net.scalar_input:
+        if self.net.scalar_input:
             self.sample_placeholder = tf.placeholder(tf.float32)
         else:
             self.sample_placeholder = tf.placeholder(tf.int32)
@@ -136,7 +132,7 @@ class Generator(object):
         self.gen_num = tf.placeholder(tf.int32)
 
         self.next_sample_prob, self.layers_out, self.qs = \
-            vocoder.net.predict_proba_incremental(self.sample_placeholder,
+            self.net.predict_proba_incremental(self.sample_placeholder,
                                                   self.gen_num,
                                                   batch_size=batch_size,
                                                   local_condition=self.lc_placeholder,
@@ -145,39 +141,33 @@ class Generator(object):
         self.initial = tf.placeholder(tf.float32)
         self.others = tf.placeholder(tf.float32)
         self.update_q_ops = \
-            vocoder.net.create_update_q_ops(self.qs,
+            self.net.create_update_q_ops(self.qs,
                                             self.initial,
                                             self.others,
                                             self.gen_num,
                                             batch_size=batch_size)
 
-        self.var_q = vocoder.net.get_vars_q()
+        self.var_q = self.net.get_vars_q()
 
-    def load(self, sess, log_dir):
-        self.vocoder.load(sess, log_dir)
-
-    def generate(self, sess, n_samples, lc, gc):
+    def synthesize(self, sess, n_samples, lc, gc):
         sess.run(tf.variables_initializer(self.var_q))
-        receptive_field = self.vocoder.net.receptive_field
 
-        if self.vocoder.net.scalar_input:
+        if self.net.scalar_input:
             seeds = [0]
         else:
             seeds = [128]
 
         seeds = [seeds]
         seeds = np.repeat(seeds, self.batch_size, axis=0)
-        #         generated = []
         generated = [seeds]
 
-        #         for j in tqdm(range(receptive_field + n_samples)):
-        #             if j < receptive_field:
-        #                 sample = seeds
-        #                 current_lc = np.zeros((self.batch_size, hparams.num_mels))
-        #             else:
-        #                 sample = generated[-1]
-        #                 current_lc = lc[:, j - receptive_field, :]
-        for j in tqdm(range(n_samples)):
+
+        if type(n_samples) == list:
+            n_sample = max(n_samples)
+        else:
+            n_sample = n_samples
+
+        for j in tqdm(range(n_sample)):
             sample = generated[-1]
             current_lc = lc[:, j, :]
 
@@ -200,7 +190,7 @@ class Generator(object):
 
             sess.run(self.update_q_ops, feed_dict=feed_dict)
 
-            if self.vocoder.net.scalar_input:
+            if self.net.scalar_input:
                 generated_sample = prob
             else:
                 # TODO: random choice
@@ -208,9 +198,13 @@ class Generator(object):
 
             generated.append(generated_sample)
 
-        # result = np.hstack(generated)[:, receptive_field:]
         result = np.hstack(generated)
-        if not self.vocoder.net.scalar_input:
-            result = P.inv_mulaw_quantize(result.astype(np.int16), self.vocoder.net.quantization_channels)
+        if not self.net.scalar_input:
+            result = P.inv_mulaw_quantize(result.astype(np.int16), self.net.quantization_channels)
+
+        if type(n_samples) == list:
+            result = [x[:n_samples[i]] for i, x in enumerate(result)]
 
         return result
+
+

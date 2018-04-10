@@ -1,5 +1,5 @@
 import tensorflow as tf
-from apps.vocoder.model.vocoder import Vocoder, Generator
+from apps.vocoder.model.vocoder import Vocoder
 
 def create_adam_optimizer(learning_rate, momentum):
     return tf.train.AdamOptimizer(learning_rate=learning_rate,
