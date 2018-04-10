@@ -26,7 +26,9 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 Neural Vocoder can generate high quality raw speech samples conditioned on linguistic or acoustic features.
 
-We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet_vocoder) and adapted some codes from [azraelkuan's one](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev)
+We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet_vocoder) and adapted some codes from [azraelkuan's one](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev).
+
+Audio samples are available at https://twidddj.github.io/docs/vocoder. 
 
 #### Getting Start
 #### 0. Download dataset
@@ -41,8 +43,6 @@ We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet
 
 #### 3. Test model
 You can find the codes for testing trained model in <a href="./apps/vocoder/notebook/test vocoder.ipynb">here</a>.
-
-**Note**: A single speaker model has been learning on ljspeech dataset. Track the issue ["Syenthesis results"](https://github.com/twidddj/wavenet/issues/1).
 
 ## Requirements
 Code is tested on TensorFlow version 1.4 for Python 3.6.
