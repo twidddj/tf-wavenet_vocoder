@@ -28,7 +28,7 @@ Neural Vocoder can generate high quality raw speech samples conditioned on lingu
 
 We have tested our model followed [r9y9's works](https://github.com/r9y9/wavenet_vocoder) and adapted some codes from [azraelkuan's one](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev).
 
-Audio samples are available at https://twidddj.github.io/docs/vocoder. 
+Audio samples are available at https://twidddj.github.io/docs/vocoder. See the issue for the result in [here](https://github.com/twidddj/wavenet/issues/1).
 
 #### Getting Start
 #### 0. Download dataset
