@@ -47,13 +47,13 @@ You can find the codes for testing trained model in <a href="./apps/vocoder/note
 ## Requirements
 Code is tested on TensorFlow version 1.4 for Python 3.6.
 
-## Related projects
+## References
 - [Wavenet](https://github.com/ibab/tensorflow-wavenet)
 - [Wavenet vocoder in Pytorch](https://github.com/r9y9/wavenet_vocoder)
 - [Wavenet vocoder in Tensorflow](https://github.com/azraelkuan/tensorflow_wavenet_vocoder/tree/dev)
 - [Fast wavenet](https://github.com/tomlepaine/fast-wavenet)
 
-## References
+## Related Papers
 - ["WaveNet: A Generative Model for Raw Audio"](https://arxiv.org/abs/1609.03499)
 - ["Fast Wavenet Generation Algorithm"](https://arxiv.org/pdf/1611.09482.pdf)
 - ["PixelCNN++"](https://arxiv.org/pdf/1701.05517.pdf)
