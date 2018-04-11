@@ -8,7 +8,7 @@ This repository provides some works related to [WaveNet](https://deepmind.com/bl
 ## Features
 - [x] Local conditioning
 - [x] Generalized fast generation algorithm
-- [x] Mixture of discretized logistics loss (Thanks to @azraelkuan)
+- [x] Mixture of discretized logistics loss (Thanks to [@azraelkuan](https://github.com/azraelkuan))
 - [ ] Parallel Wavenet
 
 ### Generalized fast generation algorithm
@@ -26,7 +26,7 @@ You can find easily the modified points and details of the algorithm in <a href=
 
 Neural Vocoder can generate high quality raw speech samples conditioned on linguistic or acoustic features.
 
-We have tested our model followed @r9y9's [works](https://github.com/r9y9/wavenet_vocoder).
+We tested our model followed [@r9y9](https://github.com/r9y9)'s [works](https://github.com/r9y9/wavenet_vocoder).
 
 Audio samples are available at https://twidddj.github.io/docs/vocoder. See the issue for the result in [here](https://github.com/twidddj/wavenet/issues/1).
 
