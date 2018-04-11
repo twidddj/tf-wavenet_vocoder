@@ -51,8 +51,12 @@ def train(log_dir, metadata_path, data_path):
 
     loss = vocoder.loss(audio_batch, lc_batch, gc_batch)
 
+    sess = tf.Session()
+    last_step, _ = vocoder.load(sess, log_dir)
+    last_step = last_step or 1
+
     all_params = tf.trainable_variables()
-    global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
+    global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(last_step), trainable=False)
 
     decay_steps = hparams.NUM_STEPS_RATIO_PER_DECAY * hparams.max_num_step
     # Decay the learning rate exponentially based on the number of steps.
@@ -78,57 +82,53 @@ def train(log_dir, metadata_path, data_path):
     maintain_averages_op = tf.group(ema.apply(all_params))
     train_op = tf.group(optim, maintain_averages_op)
 
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
+    sess.run(tf.global_variables_initializer())
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+    reader.start_threads(sess)
 
-        last_step, _ = vocoder.load(sess, log_dir)
-        last_step = last_step or 1
+    try:
+        print_loss = 0.
+        start_time = time()
+        for step in range(last_step, hparams.max_num_step):
 
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-        reader.start_threads(sess)
+            if gc_batch is None:
+                fetches = [audio_batch, vocoder.upsampled_lc, loss, train_op]
+                _x, _lc, _loss, _ = sess.run(fetches)
+                _gc = None
+            else:
+                fetches = [audio_batch, vocoder.upsampled_lc, gc_batch, loss, train_op]
+                _x, _lc, _gc, _loss, _ = sess.run(fetches)
 
-        try:
-            print_loss = 0.
-            start_time = time()
-            for step in range(last_step, hparams.max_num_step):
+            print_loss += _loss
 
-                if gc_batch is None:
-                    fetches = [audio_batch, vocoder.upsampled_lc, loss, train_op]
-                    _x, _lc, _loss, _ = sess.run(fetches)
-                    _gc = None
-                else:
-                    fetches = [audio_batch, vocoder.upsampled_lc, gc_batch, loss, train_op]
-                    _x, _lc, _gc, _loss, _ = sess.run(fetches)
+            if step % PRINT_LOSS_EVERY == 0:
+                duration = time() - start_time
+                print('step {:d} - loss = {:.3f}, ({:.3f} sec/step)'.format(
+                    step, print_loss / PRINT_LOSS_EVERY, duration / PRINT_LOSS_EVERY))
+                start_time = time()
+                print_loss = 0.
 
-                print_loss += _loss
+            if step % hparams.checkpoint_interval == 0:
+                vocoder.save(sess, log_dir, step)
 
-                if step % PRINT_LOSS_EVERY == 0:
-                    duration = time() - start_time
-                    print('step {:d} - loss = {:.3f}, ({:.3f} sec/step)'.format(
-                        step, print_loss / PRINT_LOSS_EVERY, duration / PRINT_LOSS_EVERY))
-                    start_time = time()
-                    print_loss = 0.
+            if step % hparams.train_eval_interval == 0:
+                samples = vocoder.synthesize(sess, _x.shape[1], _lc, _gc)
+                targets = _x.reshape(hparams.batch_size, -1)
 
-                if step % hparams.checkpoint_interval == 0:
-                    vocoder.save(sess, log_dir, step)
+                for j in range(hparams.batch_size):
+                    predicted_wav = samples[j, :]
+                    target_wav = targets[j, :]
+                    predicted_wav_path = os.path.join(log_dir, 'predicted_{}_{}.wav'.format(step, j))
+                    target_wav_path = os.path.join(log_dir, 'target_{}_{}.wav'.format(step, j))
+                    save_wav(predicted_wav, predicted_wav_path)
+                    save_wav(target_wav, target_wav_path)
 
-                if step % hparams.train_eval_interval == 0:
-                    samples = vocoder.synthesize(sess, _x.shape[1], _lc, _gc)
-                    targets = _x.reshape(hparams.batch_size, -1)
-
-                    for j in range(hparams.batch_size):
-                        predicted_wav = samples[j, :]
-                        target_wav = targets[j, :]
-                        predicted_wav_path = os.path.join(log_dir, 'predicted_{}_{}.wav'.format(step, j))
-                        target_wav_path = os.path.join(log_dir, 'target_{}_{}.wav'.format(step, j))
-                        save_wav(predicted_wav, predicted_wav_path)
-                        save_wav(target_wav, target_wav_path)
-
-        except Exception as error:
-            print(error)
-        finally:
-            coord.request_stop()
-            coord.join(threads)
+    except Exception as error:
+        print(error)
+    finally:
+        coord.request_stop()
+        coord.join(threads)
+        sess.close()
 
 
 if __name__ == "__main__":
