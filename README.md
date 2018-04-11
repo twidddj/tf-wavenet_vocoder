@@ -8,7 +8,7 @@ This repository provides some works related to [WaveNet](https://deepmind.com/bl
 ## Features
 - [x] Local conditioning
 - [x] Generalized fast generation algorithm
-- [x] Mixture of discretized logistics loss (Thanks to [@azraelkuan](https://github.com/azraelkuan))
+- [x] Mixture of discretized logistics loss
 - [ ] Parallel Wavenet
 
 ### Generalized fast generation algorithm
