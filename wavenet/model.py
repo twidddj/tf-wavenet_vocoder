@@ -1,7 +1,7 @@
 """
 the code is adapted from:
-https://github.com/ibab/tensorflow-wavenet/blob/master/wavenet/model.py
-
+https://github.com/ibab/tensorflow-wavenet/blob/master/wavenet/model.py (base model)
+https://github.com/twidddj/vqvae/blob/master/wavenet/model.py
 """
 
 import numpy as np
