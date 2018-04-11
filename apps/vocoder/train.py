@@ -53,7 +53,7 @@ def train(log_dir, metadata_path, data_path):
 
     sess = tf.Session()
     last_step, _ = vocoder.load(sess, log_dir)
-    last_step = last_step or 1
+    last_step = last_step or 0
 
     all_params = tf.trainable_variables()
     global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(last_step), trainable=False)
@@ -89,7 +89,7 @@ def train(log_dir, metadata_path, data_path):
     try:
         print_loss = 0.
         start_time = time()
-        for step in range(last_step, hparams.max_num_step):
+        for step in range(last_step + 1, hparams.max_num_step):
 
             if gc_batch is None:
                 fetches = [audio_batch, vocoder.upsampled_lc, loss, train_op]
