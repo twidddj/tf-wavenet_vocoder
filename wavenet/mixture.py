@@ -70,9 +70,8 @@ def discretized_mix_logistic_loss(y_hat, y, num_class=256, log_scale_min=float(n
                                            tf.log(tf.maximum(cdf_delta, 1e-12)),
                                            log_pdf_mid - np.log((num_class - 1) / 2))))
 
-    # print(log_prob_from_logits(log_probs))
     log_probs = log_probs + tf.nn.log_softmax(logit_probs, -1)
-    # log_probs = tf.reduce_sum(log_probs, axis=-1, keepdims=True) + log_prob_from_logits(logit_probs)
+    # log_probs = log_probs + log_prob_from_logits(logit_probs)
 
     if reduce:
         return -tf.reduce_sum(log_sum_exp(log_probs))
