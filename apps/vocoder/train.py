@@ -28,8 +28,8 @@ def get_arguments():
 
 def train(log_dir, metadata_path, data_path):
     tf.reset_default_graph()
-    vocoder = Vocoder()
-    vocoder.init_synthesizer(hparams.batch_size, gc_enable=hparams.gc_enable)
+    vocoder = Vocoder(hparams)
+    vocoder.init_synthesizer(hparams.batch_size)
 
     coord = tf.train.Coordinator()
     reader = DataFeeder(

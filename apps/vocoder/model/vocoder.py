@@ -5,17 +5,18 @@ import numpy as np
 from tqdm import tqdm
 
 from wavenet.model import WaveNetModel, create_bias_variable
-from apps.vocoder.hparams import hparams
 
 import nnmnkwii.preprocessing as P
 
-
 class Vocoder(object):
-    def __init__(self, max_to_keep=5):
+    def __init__(self, hparams, max_to_keep=5):
+        self.hparams = hparams
+
         dilations_factor = hparams.layers // hparams.stacks
         dilations = [2 ** i for j in range(hparams.stacks) for i in range(dilations_factor)]
 
         self.upsample_factor = hparams.upsample_factor
+        self.gc_enable = hparams.gc_enable
         global_condition_channels = None
         global_condition_cardinality = None
         if hparams.gc_enable:
@@ -84,7 +85,7 @@ class Vocoder(object):
 
     def loss(self, x, l, g):
         self.upsampled_lc = self.create_upsample(l)
-        loss = self.net.loss(x, self.upsampled_lc, g, l2_regularization_strength=hparams.l2_regularization_strength)
+        loss = self.net.loss(x, self.upsampled_lc, g, l2_regularization_strength=self.hparams.l2_regularization_strength)
 
         return loss
 
@@ -119,7 +120,8 @@ class Vocoder(object):
             print(" No checkpoint found.")
             return None, sess
 
-    def init_synthesizer(self, batch_size, gc_enable=True):
+    def init_synthesizer(self, batch_size):
+
         self.batch_size = batch_size
         if self.net.scalar_input:
             self.sample_placeholder = tf.placeholder(tf.float32)
@@ -127,7 +129,7 @@ class Vocoder(object):
             self.sample_placeholder = tf.placeholder(tf.int32)
 
         self.lc_placeholder = tf.placeholder(tf.float32)
-        self.gc_placeholder = tf.placeholder(tf.int32) if gc_enable else None
+        self.gc_placeholder = tf.placeholder(tf.int32) if self.gc_enable else None
 
         self.gen_num = tf.placeholder(tf.int32)
 

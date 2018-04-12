@@ -7,7 +7,9 @@ hparams = tf.contrib.training.HParams(
     name="wavenet_vocoder",
 
     # Audio:
-    sample_rate=22050,
+    # sample_rate=22050, # ljspeech
+    sample_rate=16000, # cmu_arctic
+
     silence_threshold=2,
     num_mels=80,
     fft_size=1024,
@@ -28,9 +30,16 @@ hparams = tf.contrib.training.HParams(
     log_scale_min=float(np.log(1e-14)),
 
     # global condition if False set global channel to None
-    gc_enable=False,
+
+    # ljspeech
+    # gc_enable=False,
+    # global_channel=16,
+    # global_cardinality=-1,  # speaker num
+
+    # cmu_arctic
+    gc_enable=True,
     global_channel=16,
-    global_cardinality=-1,  # speaker num
+    global_cardinality=7,  # speaker num
 
     # Model:
     # This should equal to `quantize_channels` if mu-law quantize enabled
@@ -60,7 +69,7 @@ hparams = tf.contrib.training.HParams(
     checkpoint_interval=10000,
     train_eval_interval=10000,
     clip_thresh=-1,
-    initial_learning_rate=1e-4,
+    initial_learning_rate=1e-3,
     max_num_step=int(1e6),
 
     MOVING_AVERAGE_DECAY=0.9999,

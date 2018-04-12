@@ -16,6 +16,9 @@ def build_from_path(in_dir, out_dir, silence_threshold, fft_size, num_workers=1,
         for line in f:
             parts = line.strip().split('|')
             wav_path = os.path.join(in_dir, 'wavs', '%s.wav' % parts[0])
+            # In case of test file
+            if not os.path.exists(wav_path):
+                continue
             text = parts[2]
             futures.append(executor.submit(
                 partial(_process_utterance, out_dir, index, wav_path, text, silence_threshold, fft_size)))
