@@ -123,6 +123,8 @@ class Vocoder(object):
     def init_synthesizer(self, batch_size):
 
         self.batch_size = batch_size
+        self.net.batch_size = batch_size
+
         if self.net.scalar_input:
             self.sample_placeholder = tf.placeholder(tf.float32)
         else:
