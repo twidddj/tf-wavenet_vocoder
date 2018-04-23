@@ -113,8 +113,8 @@ def _process_utterance(out_dir, index, speaker_id, wav_path, text, silence_thres
     wav_id = wav_path.split('/')[-1].split('.')[0]
 
     # Write the spectrograms to disk:
-    audio_filename = '{}-audio.npy'.format(wav_id)
-    mel_filename = '{}-mel.npy'.format(wav_id)
+    audio_filename = 'cmu_arctic-audio-%05d.npy' % index
+    mel_filename = 'cmu_arctic-mel-%05d.npy' % index
     np.save(os.path.join(out_dir, audio_filename),
             out.astype(out_dtype), allow_pickle=False)
     np.save(os.path.join(out_dir, mel_filename),
