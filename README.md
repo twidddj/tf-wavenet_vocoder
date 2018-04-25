@@ -30,6 +30,12 @@ We tested our model followed [@r9y9](https://github.com/r9y9)'s [works](https://
 
 Audio samples are available at https://twidddj.github.io/docs/vocoder. See the issue for the result in [here](https://github.com/twidddj/wavenet/issues/1).
 
+#### Pre-trained models
+| Model URL                                                                 | Data       | Steps         |
+|---------------------------------------------------------------------------|------------|---------------|
+| [link](https://drive.google.com/file/d/1tptZDDZ8rOWUdse0HWn9W2cm0yN0xhx6) | LJSpeech   | 680k steps    |
+
+
 #### Getting Start
 #### 0. Download dataset
 + the voice conversion dataset(for multi speaker, 16k): [cmu_arctic](http://festvox.org/cmu_arctic/)
